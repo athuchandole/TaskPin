@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './screens/HomeScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import AddCard from './components/AddCard';
 import CustomTabBar from './components/CustomTabBar';
-import CustomStatusBar from './components/CustomStatusBar'; // Import here
+import CustomStatusBar from './components/CustomStatusBar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { loadTasks, saveTasks } from './utils/storage'; // ✅ Import
 
 const Tab = createBottomTabNavigator();
 
@@ -17,17 +17,17 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState('Home');
 
   useEffect(() => {
-    const loadTasks = async () => {
-      const stored = await AsyncStorage.getItem('tasks');
-      setTasks(stored ? JSON.parse(stored) : []);
+    const fetchTasks = async () => {
+      const loadedTasks = await loadTasks(); // ✅ Use utility
+      setTasks(loadedTasks);
     };
-    loadTasks();
+    fetchTasks();
   }, []);
 
   const addTask = async (task) => {
     const updated = [...tasks, task];
     setTasks(updated);
-    await AsyncStorage.setItem('tasks', JSON.stringify(updated));
+    await saveTasks(updated); // ✅ Use utility
   };
 
   return (
