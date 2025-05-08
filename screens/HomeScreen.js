@@ -1,10 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import ShowCard from '../components/ShowCard';
 
-export default function HomeScreen() {
+export default function HomeScreen({ tasks }) {
     return (
         <View style={styles.container}>
-            <Text>🏠 Home Screen</Text>
+            <Text style={styles.heading}>Your Tasks</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {tasks.map((task, index) => (
+                    <ShowCard
+                        key={index}
+                        title={task.title}
+                        description={task.description}
+                    />
+                ))}
+            </ScrollView>
         </View>
     );
 }
@@ -12,7 +22,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        padding: 16,
+        backgroundColor: '#f9f9f9',
+    },
+    heading: {
+        fontSize: 22,
+        fontWeight: '700',
+        marginBottom: 16,
     },
 });

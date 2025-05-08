@@ -4,87 +4,124 @@ import {
     TouchableOpacity,
     Text,
     StyleSheet,
+    Dimensions,
     Platform,
-    SafeAreaView,
+    StatusBar,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function CustomTabBar({ state, descriptors, navigation }) {
+const { width } = Dimensions.get('window');
+
+export default function CustomTabBar({ state, navigation, onAddPress }) {
     const insets = useSafeAreaInsets();
+    const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0;
 
     return (
-        <SafeAreaView
-            style={[styles.safeArea, { paddingBottom: insets.bottom || 10 }]}
-            edges={['bottom']}
+        <View
+            style={[
+                styles.container,
+                {
+                    paddingBottom: insets.bottom,
+                    paddingLeft: insets.left,
+                    paddingTop: statusBarHeight,
+                },
+            ]}
         >
-            <View style={styles.tabContainer}>
-                {state.routes.map((route, index) => {
-                    const { options } = descriptors[route.key];
-                    const label =
-                        options.tabBarLabel !== undefined
-                            ? options.tabBarLabel
-                            : options.title !== undefined
-                                ? options.title
-                                : route.name;
+            <View style={styles.tabBar}>
+                {/* Home */}
+                <TouchableOpacity
+                    style={styles.tabItem}
+                    onPress={() => navigation.navigate('Home')}
+                >
+                    <MaterialCommunityIcons name="home" size={24} color="white" />
+                    <Text style={styles.label}>Home</Text>
+                </TouchableOpacity>
 
-                    const isFocused = state.index === index;
+                {/* Transaction */}
+                <TouchableOpacity
+                    style={styles.tabItem}
+                    onPress={() => navigation.navigate('Transaction')}
+                >
+                    <MaterialCommunityIcons name="currency-inr" size={24} color="white" />
+                    <Text style={styles.label}>Transaction</Text>
+                </TouchableOpacity>
 
-                    const onPress = () => {
-                        const event = navigation.emit({
-                            type: 'tabPress',
-                            target: route.key,
-                            canPreventDefault: true,
-                        });
+                {/* Spacer for Add Button */}
+                <View style={styles.spacer} />
 
-                        if (!isFocused && !event.defaultPrevented) {
-                            navigation.navigate(route.name);
-                        }
-                    };
+                {/* Notification */}
+                <TouchableOpacity
+                    style={styles.tabItem}
+                    onPress={() => navigation.navigate('Notification')}
+                >
+                    <MaterialCommunityIcons name="bell" size={24} color="white" />
+                    <Text style={styles.label}>Notification</Text>
+                </TouchableOpacity>
 
-                    let iconName;
-                    if (route.name === 'Home') iconName = 'home';
-                    else if (route.name === 'Add') iconName = 'add-circle';
-                    else if (route.name === 'Settings') iconName = 'settings';
-
-                    return (
-                        <TouchableOpacity
-                            key={route.key}
-                            onPress={onPress}
-                            style={styles.tabButton}
-                            activeOpacity={0.7}
-                        >
-                            <Ionicons
-                                name={iconName}
-                                size={isFocused ? 28 : 24}
-                                color={isFocused ? '#007aff' : '#8e8e93'}
-                            />
-                            <Text style={{ color: isFocused ? '#007aff' : '#8e8e93', fontSize: 12 }}>
-                                {label}
-                            </Text>
-                        </TouchableOpacity>
-                    );
-                })}
+                {/* Setting */}
+                <TouchableOpacity
+                    style={styles.tabItem}
+                    onPress={() => navigation.navigate('SettingsScreen')}
+                >
+                    <MaterialCommunityIcons name="cog" size={24} color="white" />
+                    <Text style={styles.label}>Setting</Text>
+                </TouchableOpacity>
             </View>
-        </SafeAreaView>
+
+            {/* Center Add Button */}
+            <TouchableOpacity onPress={onAddPress} style={styles.addButton}>
+                <Ionicons name="add" size={36} color="white" />
+            </TouchableOpacity>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    safeArea: {
-        backgroundColor: '#fff',
+    container: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        backgroundColor: 'transparent',
+        alignItems: 'center',
     },
-    tabContainer: {
+    tabBar: {
         flexDirection: 'row',
-        height: 60,
-        borderTopWidth: 1,
-        borderTopColor: '#ddd',
-        justifyContent: 'space-around',
+        backgroundColor: '#6200EE',
+        height: 70,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        width: '100%',
+    },
+    tabItem: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
     },
-    tabButton: {
-        flex: 1,
+    label: {
+        fontSize: 12,
+        color: 'white',
+        marginTop: 2,
+    },
+    spacer: {
+        width: 70, // Leave space for Add button
+    },
+    addButton: {
+        position: 'absolute',
+        top: -30,
+        backgroundColor: '#A450F7',
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 8,
     },
 });
